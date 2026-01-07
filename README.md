@@ -76,7 +76,7 @@ Prerrequisitos: **Python 3.10+** y **Git** instalados.
 
 1.  **Clonar el repositorio:**
     ```bash
-    git clone [https://github.com/TU_USUARIO/ecommerce-analytics-dbt.git](https://github.com/TU_USUARIO/ecommerce-analytics-dbt.git)
+    git clone https://github.com/juancruzgodoy/dbt-ecommerce-analytics
     cd ecommerce-analytics-dbt
     ```
 
