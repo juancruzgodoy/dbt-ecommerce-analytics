@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: fct_orders
+    description: "Fact table representing individual purchase orders. One row per order."
+    columns:
+      - name: order_id
+        description: "Primary key of the order."
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Foreign key to the customer who made the order."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_id
+              severity: warn
+
+  - name: fct_order_items
+    description: "Fact table containing the detailed line items for each order."
+    columns:
+      - name: order_id
+        tests:
+          - relationships:
+              to: ref('fct_orders')
+              field: order_id
+      - name: product_id
+        tests:
+          - relationships:
+              to: ref('dim_products')
+              field: product_id
+
+  - name: dim_products
+    description: "Dimension table containing the product catalog and category details."
+    columns:
+      - name: product_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_customers
+    description: "Dimension table containing customer profiles."
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null

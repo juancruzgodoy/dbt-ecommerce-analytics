@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: "Staging table for orders data."
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Identifier for the customer who placed the order."
+        tests:
+          - not_null
