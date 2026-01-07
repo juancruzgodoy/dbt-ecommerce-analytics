@@ -36,7 +36,7 @@ Se implementaron tests automáticos (`schema.yml`) para asegurar la integridad:
 * **DuckDB:** Base de datos analítica embebida (procesamiento local de alto rendimiento).
 * **SQL:** Lenguaje de modelado.
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```text
 ecommerce_analytics/
