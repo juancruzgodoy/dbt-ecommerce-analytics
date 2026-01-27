@@ -99,6 +99,6 @@ En un entorno de producción real, estos modelos de staging se refactorizarían 
 * Carga incremental de tablas masivas.
 * Separación entre la ingesta (EL) y la transformación (T).
 
-* **Snapshots (Historial de Cambios):**
+**Snapshots (Historial de Cambios):**
   Actualmente no se aplica la estrategia de *Slowly Changing Dimensions (Tipo 2)* porque el origen de datos son archivos estáticos (Seeds). En un entorno productivo, se utilizarían dbt snapshots para rastrear cambios históricos en dimensiones como `precios` o `direcciones` de clientes.
 
