@@ -7,10 +7,11 @@ products AS (
 categories AS (
     SELECT * FROM {{ ref('stg_categories') }}
 ),
-riched AS (
+enriched AS (
     SELECT
 
         -- Order Item info
+        oi.order_item_id,
         oi.order_id,
         oi.quantity,
         oi.unit_price,
@@ -39,4 +40,4 @@ riched AS (
         p.category_id = c.category_id
 )
 
-SELECT * FROM riched
+SELECT * FROM enriched

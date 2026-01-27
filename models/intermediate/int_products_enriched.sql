@@ -17,7 +17,7 @@ enriched AS (
         p.price,
 
         -- Category info
-        c.category_name,
+        c.category_name
 
     FROM
         products AS p

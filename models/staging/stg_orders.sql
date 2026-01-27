@@ -8,7 +8,17 @@ renamed AS (
         CAST(order_number AS STRING) AS order_number,
         customer_id,
         CAST(order_date AS DATE) AS order_date,
-        CAST(status AS STRING) AS status,
+
+        -- Map Spanish status to English
+        CASE CAST(status AS STRING)
+            WHEN 'pendiente' THEN 'pending'
+            WHEN 'procesando' THEN 'processing'
+            WHEN 'enviado' THEN 'shipped'
+            WHEN 'entregado' THEN 'delivered'
+            WHEN 'cancelado' THEN 'cancelled'
+            ELSE CAST(status AS STRING)
+        END AS status,        
+        
         CAST(subtotal AS DECIMAL(10,2)) AS subtotal,
         CAST(discount_percent AS DECIMAL(10,2)) AS discount_percent,
         CAST(shipping_cost AS DECIMAL(10,2)) AS shipping_cost,

@@ -1,18 +1,21 @@
-WITH int_orders_customers AS (
-    SELECT * FROM {{ ref('stg_customers') }}
+WITH orders_with_customers AS (
+    SELECT * FROM {{ ref('int_orders_customers') }}
 ),
 
-filtrered_customers AS (
-    SELECT
+filtered_customers AS (
+
+    SELECT DISTINCT
         customer_id,
         first_name,
         last_name,
         email,
         phone,
+        country,
         city,
-        postal_code,
+        postal_code
+
     FROM
-        int_orders_customers
+        orders_with_customers
 )
 
-SELECT * FROM filtrered_customers
+SELECT * FROM filtered_customers

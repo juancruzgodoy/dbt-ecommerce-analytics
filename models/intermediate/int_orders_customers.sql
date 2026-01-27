@@ -6,7 +6,7 @@ customers AS (
     SELECT * FROM {{ ref('stg_customers') }}
 ),
 
-riched AS (
+enriched AS (
     SELECT
 
         -- Order info
@@ -20,8 +20,10 @@ riched AS (
         c.first_name,
         c.last_name,
         c.email,
+        c.phone,
         c.city,
         c.country,
+        c.postal_code,
 
         -- Clasificacion segun registro
         CASE
@@ -37,4 +39,4 @@ riched AS (
         o.customer_id = c.customer_id
 )
 
-SELECT * FROM riched
+SELECT * FROM enriched

@@ -1,4 +1,4 @@
-WITH dim_products AS (
+WITH products AS (
     SELECT * FROM {{ ref('int_products_enriched') }}
 ),
 
@@ -9,10 +9,10 @@ filtered_products AS (
         product_name,
         description,
         price,
-        category_name,
+        category_name
 
     FROM
-        dim_products
+        products
 )
 
 SELECT * FROM filtered_products

@@ -1,6 +1,7 @@
 WITH source AS (
     SELECT * FROM {{ ref('ecommerce_categories') }}
 ),
+
 renamed AS (
     SELECT
         category_id,

@@ -1,10 +1,12 @@
-WITH fct_order_items AS (
+WITH order_items_with_products AS (
     SELECT * FROM {{ ref('int_order_items_products') }}
 ),
 
 filtered_order_items AS (
+
     SELECT
         order_id,
+        order_item_id,
         product_id,
         product_name,
         category_name,
@@ -12,7 +14,7 @@ filtered_order_items AS (
         total_amount,
         total_profit
     FROM
-        fct_order_items
+        order_items_with_products
 )
 
 SELECT * FROM filtered_order_items

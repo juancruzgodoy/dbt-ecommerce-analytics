@@ -31,6 +31,10 @@ models:
           - relationships:
               to: ref('dim_products')
               field: product_id
+      - name: order_item_id
+        tests:
+          - unique
+          - not_null
 
   - name: dim_products
     description: "Dimension table containing the product catalog and category details."

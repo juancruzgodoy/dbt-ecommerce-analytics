@@ -7,9 +7,9 @@ Este proyecto es un Data Warehouse moderno construido localmente utilizando **db
 El proyecto sigue la estructura de capas estándar de Analytics Engineering:
 
 1.  **Staging (`models/staging`):**
-    * Limpieza básica de datos crudos (casting de tipos, renombrado de columnas).
+    * Limpieza básica de datos crudos (casting de tipos).
+    * **Estandarización:** Traducción de estados de órdenes de Español a Inglés (ej: `pendiente` -> `pending`).
     * Materialización: Vistas.
-    * Fuentes: Orders, Customers, Products, Order Items, Categories.
 
 2.  **Intermediate (`models/intermediate`):**
     * Lógica de negocio y cruces complejos (Joins).
@@ -17,57 +17,46 @@ El proyecto sigue la estructura de capas estándar de Analytics Engineering:
     * Cálculo de métricas a nivel de ítem (ganancia, subtotales).
 
 3.  **Marts (`models/marts`):**
-    * Tablas finales para consumo de BI (PowerBI, Tableau, Metabase).
+    * Tablas finales para consumo de BI.
+    * **Lógica de Calidad:** Deduplicación de clientes para asegurar granularidad única.
     * **Esquema de Estrella:**
         * `fct_orders`: Tabla de hechos de cabecera de pedidos.
         * `fct_order_items`: Tabla de hechos detallada con métricas de producto.
-        * `dim_customers`: Dimensión de clientes.
+        * `dim_customers`: Dimensión de clientes única.
         * `dim_products`: Dimensión de productos y categorías.
-     
+
 ## Calidad de Datos
 
-Se implementaron tests automáticos (`schema.yml`) para asegurar la integridad:
-* **Primary Keys:** Tests de `unique` y `not_null`.
-* **Foreign Keys:** Tests de `relationships` para asegurar integridad referencial entre Facts y Dimensions.
-
-## Tecnologías
-
-* **dbt Core:** Transformación y testing de datos.
-* **DuckDB:** Base de datos analítica embebida (procesamiento local de alto rendimiento).
-* **SQL:** Lenguaje de modelado.
+Se implementaron múltiples niveles de testing (`dbt build` passing: 63 tests):
+* **Schema Tests:** `unique`, `not_null` y `accepted_values` (para estados de órdenes).
+* **Integridad Referencial:** Tests de `relationships` entre todas las tablas del modelo estrella.
+* **Tests Singulares:** Validación de lógica de negocio (ej: `assert_total_amount_is_positive.sql`).
 
 ## Estructura del Proyecto
 
 ```text
 ecommerce_analytics/
-├── dbt_project.yml          # Configuración principal de dbt
-├── README.md                # Documentación del proyecto
-├── .gitignore               # Archivos ignorados por Git
+├── dbt_project.yml          # Configuración principal
+├── README.md                # Documentación
 ├── models/
-│   ├── staging/             # Limpieza de datos crudos (1:1 con seeds)
-│   │   ├── schema.yml       # Tests y documentación de staging
-│   │   ├── stg_categories.sql
-│   │   ├── stg_customers.sql
-│   │   ├── stg_order_items.sql
-│   │   ├── stg_orders.sql
-│   │   └── stg_products.sql
-│   ├── intermediate/        # Lógica de negocio y Joins
-│   │   ├── int_order_items_products.sql
+│   ├── staging/             # Limpieza y Estandarización
+│   │   ├── schema.yml
+│   │   ├── stg_orders.sql   # Incluye traducción de estados
+│   │   └── ...
+│   ├── intermediate/        # Joins y Enriquecimiento
+│   │   ├── schema.yml
 │   │   ├── int_orders_customers.sql
-│   │   └── int_products_enriched.sql
-│   └── marts/               # Modelos finales (Star Schema)
-│       ├── schema.yml       # Tests de integridad (PKs, FKs)
-│       ├── dim_customers.sql
-│       ├── dim_products.sql
+│   │   └── ...
+│   └── marts/               # Modelos Finales
+│       ├── schema.yml       # Tests PK/FK exhaustivos
+│       ├── dim_customers.sql # Incluye deduplicación
 │       ├── fct_order_items.sql
-│       └── fct_orders.sql
-├── seeds/                   # Archivos CSV (Datos fuente)
-│   ├── ecommerce_customers.csv
-│   ├── ecommerce_orders.csv
-│   ├── ecommerce_products.csv
-│   └── ... (otros archivos fuente)
-├── tests/                   # Tests singulares (SQL custom)
-└── analysis/                # Consultas analíticas ad-hoc
+│       └── ...
+├── macros/
+│   └── calculate_margin.sql # Lógica reutilizable (Jinja)
+├── tests/
+│   └── assert_total_amount_is_positive.sql # Test de calidad de negocio
+└── seeds/                   # Archivos CSV (Datos fuente)
 ```
 
 ## Cómo ejecutar el proyecto
@@ -100,3 +89,16 @@ Prerrequisitos: **Python 3.10+** y **Git** instalados.
     dbt docs generate
     dbt docs serve
     ```
+
+## Notas de Arquitectura (Deuda Técnica)
+
+**Uso de Seeds vs. Sources:**
+Para facilitar la ejecución local y la portabilidad de este demo, se utilizan **dbt seeds** para cargar los datos crudos (archivos CSV).
+En un entorno de producción real, estos modelos de staging se refactorizarían para leer desde fuentes definidas en un archivo `_sources.yml` utilizando la función `{{ source() }}`, permitiendo:
+* Controles de frescura de datos (`freshness checks`).
+* Carga incremental de tablas masivas.
+* Separación entre la ingesta (EL) y la transformación (T).
+
+* **Snapshots (Historial de Cambios):**
+  Actualmente no se aplica la estrategia de *Slowly Changing Dimensions (Tipo 2)* porque el origen de datos son archivos estáticos (Seeds). En un entorno productivo, se utilizarían dbt snapshots para rastrear cambios históricos en dimensiones como `precios` o `direcciones` de clientes.
+

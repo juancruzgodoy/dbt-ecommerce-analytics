@@ -1,6 +1,7 @@
-WITH fct_orders AS (
+WITH orders_with_customers AS (
     SELECT * FROM {{ ref('int_orders_customers') }}
 ),
+
 filtered_orders AS (
     SELECT
         order_id,
@@ -8,7 +9,7 @@ filtered_orders AS (
         order_date,
         total_amount
     FROM
-        fct_orders
+        orders_with_customers
 )
 
 SELECT * FROM filtered_orders
